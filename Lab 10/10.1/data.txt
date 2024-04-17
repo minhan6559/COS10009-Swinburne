@@ -1,0 +1,13 @@
+6
+Fred
+20
+Jill
+19
+Johnny
+22
+Sam
+18
+Jenny
+23
+Bill
+17

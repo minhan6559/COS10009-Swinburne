@@ -93,21 +93,6 @@ class GameWindow < Gosu::Window
     end
   end
 
-  def print_cells()
-    x_cell_count = MAP_WIDTH / CELL_DIM
-    y_cell_count = MAP_HEIGHT / CELL_DIM
-    for x in 0..(x_cell_count-1) do
-      for y in 0..(y_cell_count-1) do
-        no = @columns[x][y].north == nil ? "0" : "1"
-        so = @columns[x][y].south == nil ? "0" : "1"
-        ea = @columns[x][y].east == nil ? "0" : "1"
-        we = @columns[x][y].west == nil ? "0" : "1"
-        puts("Cell x: #{x}, y: #{y} north:#{no} south: #{so} east: #{ea} west: #{we}")
-      end
-      puts "-------- End of Column --------"
-    end
-  end
-
   # this is called by Gosu to see if should show the cursor (or mouse)
   def needs_cursor?
     true
@@ -165,6 +150,31 @@ class GameWindow < Gosu::Window
       # cells such as vacant, visited and on_path.
       # Cells on the outer boundaries will always have a nil on the
       # boundary side
+      cell = @columns[cell_x][cell_y]
+
+      if cell.north and cell.north.vacant and not cell.north.visited
+        cell.north.visited = true
+        north_path = search(cell_x, cell_y - 1)
+        cell.north.visited = false
+      end
+      
+      if cell.south and cell.south.vacant and not cell.south.visited
+        cell.south.visited = true
+        south_path = search(cell_x, cell_y + 1)
+        cell.south.visited = false
+      end
+
+      if cell.east and cell.east.vacant and not cell.east.visited
+        cell.east.visited = true
+        east_path = search(cell_x + 1, cell_y)
+        cell.east.visited = false
+      end
+
+      if cell.west and cell.west.vacant and not cell.west.visited
+        cell.west.visited = true
+        west_path = search(cell_x - 1, cell_y)
+        cell.west.visited = false
+      end
 
       # pick one of the possible paths that is not nil (if any):
       if (north_path != nil)
@@ -182,12 +192,12 @@ class GameWindow < Gosu::Window
         if (ARGV.length > 0) # debug
           puts "Added x: " + cell_x.to_s + " y: " + cell_y.to_s
         end
-        [[cell_x,cell_y]].concat(path)
+        return [[cell_x,cell_y]].concat(path)
       else
         if (ARGV.length > 0) # debug
           puts "Dead end x: " + cell_x.to_s + " y: " + cell_y.to_s
         end
-        nil  # dead end
+        return nil  # dead end
       end
     end
   end
@@ -268,5 +278,4 @@ class GameWindow < Gosu::Window
 end
 
 window = GameWindow.new
-window.print_cells
 window.show

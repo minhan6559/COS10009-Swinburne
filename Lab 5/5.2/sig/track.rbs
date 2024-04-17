@@ -1,0 +1,15 @@
+# TypeProf 0.21.3
+
+# Classes
+class Object
+  private
+  def read_track: (File a_file) -> Track
+  def print_track: (Track track) -> nil
+  def main: -> nil
+end
+
+class Track
+  attr_accessor name: String?
+  attr_accessor location: String?
+  def initialize: (String? name, String? location) -> void
+end
