@@ -180,6 +180,46 @@ def select_track_menu(album)
     puts "Playing \"#{track.name}\" from \"#{album.title}\""
 end
 
+# Add Album Menu
+def add_album_menu(albums)
+    artist = read_string("Enter the artist: ")
+    title = read_string("Enter the title: ")
+    label = read_string("Enter the label: ")
+    genre = read_integer_in_range("Enter the genre (a number between 1 and 4): ", 1, 4)
+    tracks = read_tracks_from_user()
+
+    album = Album.new(artist, title, label, genre, tracks)
+    albums << album
+
+    draw_dividing_line()
+    puts "Successfully added album."
+    puts "Title".ljust(20) + "Artist".ljust(20) + "Label".ljust(20) + "Genre".ljust(20)
+    puts album.title.ljust(20) + album.artist.ljust(20) + album.label.ljust(20) + $genre_names[album.genre].ljust(20)
+
+    puts "\nList of Tracks"
+    i = 0
+    while i < album.tracks.length
+        puts "#{i}. #{album.tracks[i].name}"
+        i += 1
+    end
+end
+
+def read_tracks_from_user()
+    tracks = []
+    count = read_integer_in_range("Enter the number of tracks: ", 1, 100)
+
+    i = 0
+    while i < count
+        puts "\nTrack #{i + 1}"
+        name = read_string("Enter the track name: ")
+        location = read_string("Enter the track location: ")
+        tracks << Track.new(name, location)
+        i += 1
+    end
+
+    return tracks
+end
+
 def main()
     albums = []
     while true
@@ -187,6 +227,7 @@ def main()
         puts "1. Read in Album"
         puts "2. Display Albums"
         puts "3. Select an album to play"
+        puts "4. Add an album"
         puts "5. Exit"
         choice = read_integer_in_range("Enter your choice: ", 1, 5)
 
@@ -198,6 +239,8 @@ def main()
             display_albums_menu(albums)
         when 3
             select_album_menu(albums)
+        when 4
+            add_album_menu(albums)
         when 5
             puts "BYE !!!!"
             break
