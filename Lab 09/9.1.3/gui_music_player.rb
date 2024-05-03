@@ -2,7 +2,8 @@ require 'rubygems'
 require 'gosu'
 
 TOP_COLOR = Gosu::Color.new(0xFF1EB1FA)
-BOTTOM_COLOR = Gosu::Color.new(0xFF1D4DB5)
+BACKGROUND_COLOR = Gosu::Color.argb(0xff_70d7ff)
+SCALE_FACTOR = 0.4
 
 module ZOrder
   BACKGROUND, PLAYER, UI = *0..2
@@ -12,91 +13,128 @@ module Genre
   POP, CLASSIC, JAZZ, ROCK = *1..4
 end
 
+module ScreenType
+	ALBUMS, TRACKS = *0..1
+end
+
 GENRE_NAMES = ['Null', 'Pop', 'Classic', 'Jazz', 'Rock']
 
-class ArtWork
-	attr_accessor :bmp
+# Put your record definitions here
+class Album
+	attr_accessor :title, :artist, :genre, :artwork, :tracks
 
-	def initialize (file)
-		@bmp = Gosu::Image.new(file)
+	def initialize (title, artist, artwork, tracks)
+		@title = title
+		@artist = artist
+		@artwork = artwork
+		@tracks = tracks
 	end
 end
 
-# Put your record definitions here
+class Track
+	attr_accessor :title, :location
+
+	def initialize (title, location)
+		@title = title
+		@location = location
+	end
+end
+
+def read_track(file)
+    track_name = file.gets.chomp
+    track_location = file.gets.chomp
+    return Track.new(track_name, track_location)
+end
+
+def read_tracks(file)
+    tracks = []
+    count = file.gets.to_i
+    i = 0
+    while i < count
+        tracks << read_track(file)
+        i += 1
+    end
+    return tracks
+end
+
+def read_album(file)
+    title = file.gets.chomp
+    artist = file.gets.chomp
+	artwork_name = file.gets.chomp
+    tracks = read_tracks(file)
+    return Album.new(title, artist, artwork_name, tracks)
+end
+
+def read_albums()
+    albums = []
+    file = File.new('albums.txt', 'r')
+    count = file.gets.to_i
+
+    i = 0
+    while i < count
+        albums << read_album(file)
+        i += 1
+    end
+
+    file.close
+    return albums
+end
 
 class MusicPlayerMain < Gosu::Window
 
 	def initialize
-	    super 600, 800
+	    super 500, 700
 	    self.caption = "Music Player"
 
 		# Reads in an array of albums from a file and then prints all the albums in the
 		# array to the terminal
+		@albums = read_albums()
+		@big_font = Gosu::Font.new(20)
+		@small_font = Gosu::Font.new(10)
+
+		@screen_type = ScreenType::ALBUMS
+		@selected_album = 0
+		@selected_track = 0
 	end
+	
+  def draw_albums(albums)
 
-  # Put in your code here to load albums and tracks
-
-  # Draws the artwork on the screen for all the albums
-
-  def draw_albums albums
-    # complete this code
   end
 
-  # Detects if a 'mouse sensitive' area has been clicked on
-  # i.e either an album or a track. returns true or false
-
   def area_clicked(leftX, topY, rightX, bottomY)
-     # complete this code
+
   end
 
 
   # Takes a String title and an Integer ypos
   # You may want to use the following:
   def display_track(title, ypos)
-  	@track_font.draw(title, TrackLeftX, ypos, ZOrder::PLAYER, 1.0, 1.0, Gosu::Color::BLACK)
-  end
-
-
-  # Takes a track index and an Album and plays the Track from the Album
-
-  def playTrack(track, album)
-  	 # complete the missing code
-  			@song = Gosu::Song.new(album.tracks[track].location)
-  			@song.play(false)
-    # Uncomment the following and indent correctly:
-  	#	end
-  	# end
+  	@small_font.draw(title, TrackLeftX, ypos, ZOrder::PLAYER, 1.0, 1.0, Gosu::Color::BLACK)
   end
 
 # Draw a coloured background using TOP_COLOR and BOTTOM_COLOR
 
 	def draw_background
-
+		Gosu.draw_rect(0, 0, 500, 700, BACKGROUND_COLOR, ZOrder::BACKGROUND, mode=:default)
 	end
-
-# Not used? Everything depends on mouse actions.
 
 	def update
 	end
 
- # Draws the album images and the track list for the selected album
-
 	def draw
 		# Complete the missing code
-		draw_background
+		draw_background()
+		img = Gosu::Image.new("images/" + "After_Hours.bmp")
+		# draw img with scale of 0.5
+		img.draw(0, 0, ZOrder::PLAYER, scale_x = 0.4, scale_y = 0.4)
 	end
 
  	def needs_cursor?; true; end
 
-	# If the button area (rectangle) has been clicked on change the background color
-	# also store the mouse_x and mouse_y attributes that we 'inherit' from Gosu
-	# you will learn about inheritance in the OOP unit - for now just accept that
-	# these are available and filled with the latest x and y locations of the mouse click.
-
 	def button_down(id)
 		case id
 	    when Gosu::MsLeft
-	    	# What should happen here?
+
 	    end
 	end
 
