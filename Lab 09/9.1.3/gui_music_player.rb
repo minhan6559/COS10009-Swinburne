@@ -158,7 +158,7 @@ class MusicPlayerMain < Gosu::Window
 			track_color = Gosu::Color::WHITE
 			if i == @selected_track
 				track_title = "<b>#{track.title}</b>"
-				track_color = Gosu::Color::AQUA
+				track_color = Gosu::Color.argb(0xff_4FCEFF)
 				if @change_track
 					@song = Gosu::Song.new(track.location)
 					@song.play(false)
