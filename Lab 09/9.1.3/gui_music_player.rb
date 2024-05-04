@@ -91,6 +91,7 @@ class MusicPlayerMain < Gosu::Window
 		@albums = read_albums()
 		@big_font = Gosu::Font.new(25)
 		@small_font = Gosu::Font.new(18)
+		@credit_font = Gosu::Font.new(15)
 
 		@screen_type = ScreenType::ALBUMS
 		@selected_album = 0
@@ -100,7 +101,9 @@ class MusicPlayerMain < Gosu::Window
 	end
 	
 	def draw_albums_screen(albums)
-		@big_font.draw_text("Choose an Album to play", 132, 34, ZOrder::UI, 1.0, 1.0, Gosu::Color::AQUA)
+		choose_prompt = "Choose an Album to play"
+		x_choose = (500 - @big_font.text_width(choose_prompt, 1.0)) / 2
+		@big_font.draw_text(choose_prompt, x_choose, 34, ZOrder::UI, 1.0, 1.0, Gosu::Color::AQUA)
 
 		i = 0
 		while i < 2
@@ -250,12 +253,18 @@ class MusicPlayerMain < Gosu::Window
 
 	def draw
 		draw_background()
+
 		case @screen_type
 		when ScreenType::ALBUMS
 			draw_albums_screen(@albums)
 		when ScreenType::TRACKS
 			draw_tracks_screen(@albums[@selected_album])
 		end
+
+		# Draw credit
+		credit_text = "@Created by Minh An Nguyen, 2024"
+		x_credit = (500 - @credit_font.text_width(credit_text, 1.0)) / 2
+		@credit_font.draw_text(credit_text, x_credit, 666, ZOrder::UI, 1.0, 1.0, Gosu::Color.argb(0xff_70D7FF))
 	end
 
  	def needs_cursor?; true; end
