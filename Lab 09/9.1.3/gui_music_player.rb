@@ -9,15 +9,9 @@ module ZOrder
   BACKGROUND, PLAYER, UI = *0..2
 end
 
-module Genre
-  POP, CLASSIC, JAZZ, ROCK = *1..4
-end
-
 module ScreenType
 	ALBUMS, TRACKS = *0..1
 end
-
-GENRE_NAMES = ['Null', 'Pop', 'Classic', 'Jazz', 'Rock']
 
 # Put your record definitions here
 class Album
@@ -175,7 +169,11 @@ class MusicPlayerMain < Gosu::Window
 		end
 
 		# Draw media buttons
-		btns = Gosu::Image.new("buttons/Media_Buttons.png")
+		if @manual_pause
+			btns = Gosu::Image.new("buttons/Media_Buttons_Play.png")
+		else
+			btns = Gosu::Image.new("buttons/Media_Buttons_Pause.png")
+		end
 		btns.draw(161, 575, ZOrder::UI)
 	end
 
@@ -280,7 +278,6 @@ class MusicPlayerMain < Gosu::Window
 			end
 	    end
 	end
-
 end
 
 MusicPlayerMain.new.show if __FILE__ == $0

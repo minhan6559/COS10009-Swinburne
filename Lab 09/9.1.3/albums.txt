@@ -2,13 +2,15 @@
 After Hours
 The Weeknd
 After_Hours
-3
+4
 Blinding Lights
 tracks/Blinding_Lights.mp3
 After Hours
 tracks/After_Hours.mp3
 Save Your Tears
 tracks/Save_Your_Tears.mp3
+In Your Eyes
+tracks/In_Your_Eyes.mp3
 Live A Life You Will Remember
 Avicii
 Live_A_Life_You_Will_Remember
@@ -36,10 +38,12 @@ tracks/Wildest_Dreams.mp3
 Hollywood's Bleeding
 Post Malone
 Hollywood's_Bleeding
-3
+4
 Sunflower
 tracks/Sunflower.mp3
 Circles
 tracks/Circles.mp3
 Goodbyes
 tracks/Goodbyes.mp3
+Wow
+tracks/Wow.mpe
