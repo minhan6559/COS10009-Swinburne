@@ -275,7 +275,6 @@ class MusicPlayerMain < Gosu::Window
 			if @song.volume == 0
 				@song.volume = @old_volume
 			else
-				@old_volume = @song.volume
 				@song.volume = 0
 			end
 		end
