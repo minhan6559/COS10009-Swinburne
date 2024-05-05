@@ -6,7 +6,7 @@ BACKGROUND_COLOR = Gosu::Color.argb(0xff_252526)
 ARTWORK_WIDTH = 544
 
 module ZOrder
-  BACKGROUND, PLAYER, UI = *0..2
+  BACKGROUND, MIDDLE, TOP = *0..2
 end
 
 module ScreenType
@@ -99,7 +99,7 @@ class MusicPlayerMain < Gosu::Window
 	def draw_albums_screen(albums)
 		choose_prompt = "Choose an Album to play"
 		x_choose = (500 - @big_font.text_width(choose_prompt, 1.0)) / 2
-		@big_font.draw_text(choose_prompt, x_choose, 34, ZOrder::UI, 1.0, 1.0, Gosu::Color::AQUA)
+		@big_font.draw_text(choose_prompt, x_choose, 34, ZOrder::TOP, 1.0, 1.0, Gosu::Color::AQUA)
 
 		i = 0
 		while i < 2
@@ -107,14 +107,14 @@ class MusicPlayerMain < Gosu::Window
 			while j < 2
 				album = albums[i * 2 + j]
 				artwork = Gosu::Image.new("images/#{album.artwork}.png")
-				artwork.draw(24 + j * 236, 91 + i * 302, ZOrder::UI, scale_x = 0.4, scale_y = 0.4)
+				artwork.draw(24 + j * 236, 91 + i * 302, ZOrder::TOP, scale_x = 0.4, scale_y = 0.4)
 
 				x_text = 132 + j * 236
 				x_minus = @small_font.text_width(album.title, 1.0) / 2.0
 
 				y_text = 317 + i * 302
 
-				@small_font.draw_text(album.title, x_text - x_minus, y_text, ZOrder::UI, 1.0, 1.0, Gosu::Color::WHITE)
+				@small_font.draw_text(album.title, x_text - x_minus, y_text, ZOrder::TOP, 1.0, 1.0, Gosu::Color::WHITE)
 				j += 1
 			end
 			i += 1
@@ -123,29 +123,29 @@ class MusicPlayerMain < Gosu::Window
 
 	def draw_tracks_screen(album)
 		home_btn = Gosu::Image.new("elements/Home_Button.png")
-		home_btn.draw(10, 9, ZOrder::UI)
-		@small_font.draw_text("Back to Home", 36, 12, ZOrder::UI, 1.0, 1.0, Gosu::Color::WHITE)
+		home_btn.draw(10, 9, ZOrder::TOP)
+		@small_font.draw_text("Back to Home", 36, 12, ZOrder::TOP, 1.0, 1.0, Gosu::Color::WHITE)
 		
 		# Draw the album title
 		x_title = 244
 		x_minus = @big_font.text_width(album.title, 1.0) / 2.0
 		y_title = 58
-		@big_font.draw_markup("<b>#{album.title}</b>", x_title - x_minus, y_title, ZOrder::UI, 1.0, 1.0, Gosu::Color::AQUA)
+		@big_font.draw_markup("<b>#{album.title}</b>", x_title - x_minus, y_title, ZOrder::TOP, 1.0, 1.0, Gosu::Color::AQUA)
 
 		# Draw the album artwork
 		artwork = Gosu::Image.new("images/#{album.artwork}.png")
-		artwork.draw(114, 101, ZOrder::UI, scale_x = 0.5, scale_y = 0.5)
+		artwork.draw(114, 101, ZOrder::TOP, scale_x = 0.5, scale_y = 0.5)
 
 		# Draw the artist
 		x_artist = 246
 		x_minus = @small_font.text_width(album.artist, 1.0) / 2.0
 		y_artist = 379
-		@small_font.draw_text(album.artist, x_artist - x_minus, y_artist, ZOrder::UI, 1.0, 1.0, Gosu::Color::WHITE)
+		@small_font.draw_text(album.artist, x_artist - x_minus, y_artist, ZOrder::TOP, 1.0, 1.0, Gosu::Color::WHITE)
 
 		# Draw the tracks
-		# Gosu.draw_rect(115, 420, 272, 133, Gosu::Color.argb(0xff_8E8E93), ZOrder::PLAYER, mode=:default)
+		# Gosu.draw_rect(115, 420, 272, 133, Gosu::Color.argb(0xff_8E8E93), ZOrder::MIDDLE, mode=:default)
 		track_box = Gosu::Image.new("elements/Track_Box.png")
-		track_box.draw(115, 418, ZOrder::PLAYER)
+		track_box.draw(115, 418, ZOrder::MIDDLE)
 
 		i = 0
 		while i < album.tracks.length
@@ -164,7 +164,7 @@ class MusicPlayerMain < Gosu::Window
 					@change_track = false
 				end
 			end
-			@small_font.draw_markup(track_title, 128, y_track, ZOrder::UI, 1.0, 1.0, track_color)
+			@small_font.draw_markup(track_title, 128, y_track, ZOrder::TOP, 1.0, 1.0, track_color)
 			i += 1
 		end
 
@@ -179,23 +179,18 @@ class MusicPlayerMain < Gosu::Window
 		else
 			media_btns = Gosu::Image.new("elements/Media_Buttons_Pause.png")
 		end
-		media_btns.draw(161, 575, ZOrder::UI)
+		media_btns.draw(161, 575, ZOrder::TOP)
 
 		if @song.volume == 0
 			speaker = Gosu::Image.new("elements/Speaker_Mute.png")
 		else
 			speaker = Gosu::Image.new("elements/Speaker.png")
 		end
-		speaker.draw(120, 622, ZOrder::UI)
+		speaker.draw(120, 622, ZOrder::TOP)
 
 		# Draw the volume bar
-		if mouse_x.between?(162, 162 + 176) && mouse_y.between?(629, 629 + 13) && @mouse_held
-			@song.volume = (mouse_x - 162) / 176.0
-			@old_volume = @song.volume
-		end
-
-		Gosu.draw_rect(162, 629, 176 * @song.volume, 13, Gosu::Color.argb(0xff_297cc9), ZOrder::UI, mode=:default)
-		Gosu.draw_rect(162, 629, 176, 13, Gosu::Color.argb(0xff_ffffff), ZOrder::PLAYER, mode=:default)
+		Gosu.draw_rect(162, 629, 176 * @song.volume, 13, Gosu::Color.argb(0xff_297cc9), ZOrder::TOP, mode=:default)
+		Gosu.draw_rect(162, 629, 176, 13, Gosu::Color.argb(0xff_ffffff), ZOrder::MIDDLE, mode=:default)
 
 	end
 
@@ -293,10 +288,20 @@ class MusicPlayerMain < Gosu::Window
 		# Draw credit
 		credit_text = "@Created by Minh An Nguyen, 2024"
 		x_credit = (500 - @credit_font.text_width(credit_text, 1.0)) / 2
-		@credit_font.draw_text(credit_text, x_credit, 666, ZOrder::UI, 1.0, 1.0, Gosu::Color.argb(0xff_70D7FF))
+		@credit_font.draw_text(credit_text, x_credit, 666, ZOrder::TOP, 1.0, 1.0, Gosu::Color.argb(0xff_70D7FF))
 	end
 
  	def needs_cursor?; true; end
+
+	def update
+		case @screen_type
+		when ScreenType::TRACKS
+			if mouse_x.between?(162, 162 + 176) && mouse_y.between?(629, 629 + 13) && @mouse_held
+				@song.volume = (mouse_x - 162) / 176.0
+				@old_volume = @song.volume
+			end
+		end
+	end
 
 	def button_down(id)
 		case id
