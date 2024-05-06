@@ -187,28 +187,6 @@ class MusicPlayerMain < Gosu::Window
 			i += 1
 		end
 
-		if @change_track
-			@song = Gosu::Song.new(album.tracks[@selected_track].location)
-			@change_track = false
-		end
-
-		if @manual_pause
-			@song.pause
-		else
-			@song.play(false)
-		end
-
-		if @mute
-			@song.volume = 0
-		else
-			@song.volume = @volume
-		end
-
-		if not @song.playing? and not @manual_pause
-			@selected_track = (@selected_track + 1) % album.tracks.length
-			@change_track = true
-		end
-
 		# Draw media elements
 		if @manual_pause
 			@media_btns_play.draw(161, 575, ZOrder::TOP)
@@ -282,26 +260,28 @@ class MusicPlayerMain < Gosu::Window
 		# Media elements
 		# Previous
 		if x.between?(161, 161 + 40) && y.between?(575, 575 + 40)
-			@song.stop
 			@selected_track = (@selected_track - 1) % @albums[@selected_album].tracks.length
 			@change_track = true
 		end
 
 		# Play/Pause
 		if x.between?(230, 230 + 40) && y.between?(575, 575 + 40)
-			@manual_pause = !@manual_pause
+			@manual_pause = (not @manual_pause)
 		end
 
 		# Next
 		if x.between?(300, 300 + 40) && y.between?(575, 575 + 40)
-			@song.stop
 			@selected_track = (@selected_track + 1) % @albums[@selected_album].tracks.length
 			@change_track = true
 		end
 
 		# Speaker
 		if x.between?(120, 120 + 40) && y.between?(622, 622 + 40)
-			@mute = !@mute
+			if not @mute and @song.volume == 0
+				@mute = true
+				@volume = 1.0
+			end
+			@mute = (not @mute)
 		end
 
 		# Volume bar
@@ -327,13 +307,47 @@ class MusicPlayerMain < Gosu::Window
  	def needs_cursor?; true; end
 
 	def update
-		if @screen_type == ScreenType::TRACKS and @is_dragging_volume
-			if mouse_x < 162
-				@volume = 0
-			elsif mouse_x > 338
-				@volume = 1.0
+
+		case @screen_type
+		when ScreenType::TRACKS
+			# Handle the song
+			album = @albums[@selected_album]
+			if @change_track
+				if @song != nil
+					@song.stop
+				end
+				@song = Gosu::Song.new(album.tracks[@selected_track].location)
+				@song.play(false)
+				@change_track = false
+			end
+
+			if (not @song.playing?) and (not @manual_pause)
+				@selected_track = (@selected_track + 1) % album.tracks.length
+				@change_track = true
+			end
+
+			if @manual_pause
+				@song.pause
 			else
-				@volume = (mouse_x - 162) / 176.0
+				@song.play(false)
+			end
+
+			if @mute
+				@song.volume = 0
+			else
+				@song.volume = @volume
+			end
+
+			# Handle the volume bar
+			if @is_dragging_volume
+				if mouse_x < 162
+					@volume = 0
+				elsif mouse_x > 338
+					@volume = 1.0
+				else
+					@volume = (mouse_x - 162) / 176.0
+				end
+				@mute = false
 			end
 		end
 	end
