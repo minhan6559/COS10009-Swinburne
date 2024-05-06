@@ -266,6 +266,11 @@ class MusicPlayerMain < Gosu::Window
 
 		# Play/Pause
 		if x.between?(230, 230 + 40) && y.between?(575, 575 + 40)
+			if @song.playing?
+				@song.pause
+			else
+				@song.play(false)
+			end
 			@manual_pause = (not @manual_pause)
 		end
 
@@ -324,12 +329,6 @@ class MusicPlayerMain < Gosu::Window
 			if (not @song.playing?) and (not @manual_pause)
 				@selected_track = (@selected_track + 1) % album.tracks.length
 				@change_track = true
-			end
-
-			if @manual_pause
-				@song.pause
-			else
-				@song.play(false)
 			end
 
 			if @mute
