@@ -239,7 +239,7 @@ class MusicPlayerMain < Gosu::Window
 		# Select track
 		i = 0
 		while i < @albums[@selected_album].tracks.length
-			if x.between?(115, 115 + 272) && y.between?(418 + i * 30, 418 + i * 30 + 30)
+			if x.between?(115, 115 + 272) && y.between?(430 + i * 30, 430 + i * 30 + 30)
 				if @selected_track != i
 					@selected_track = i
 					@change_track = true
