@@ -59,9 +59,9 @@ def read_album(file)
     return Album.new(title, artist, artwork_name, tracks)
 end
 
-def read_albums()
+def read_albums(file_name)
     albums = []
-    file = File.new('albums.txt', 'r')
+    file = File.new(file_name, 'r')
     count = file.gets.to_i
 
     i = 0
@@ -82,7 +82,7 @@ class MusicPlayerMain < Gosu::Window
 
 		# Reads in an array of albums from a file and then prints all the albums in the
 		# array to the terminal
-		@albums = read_albums()
+		@albums = read_albums('albums.txt')
 		@big_font = Gosu::Font.new(25)
 		@small_font = Gosu::Font.new(18)
 		@credit_font = Gosu::Font.new(15)
@@ -90,9 +90,11 @@ class MusicPlayerMain < Gosu::Window
 		@screen_type = ScreenType::ALBUMS
 		@selected_album = 0
 		@selected_track = 0
-		@mouse_held = false
+
 		@change_track = true
 		@manual_pause = false
+		@is_dragging_volume = false # For volume bar
+
 		@old_volume = 1.0
 	end
 	
@@ -189,9 +191,18 @@ class MusicPlayerMain < Gosu::Window
 		speaker.draw(120, 622, ZOrder::TOP)
 
 		# Draw the volume bar
-		Gosu.draw_rect(162, 629, 176 * @song.volume, 13, Gosu::Color.argb(0xff_297cc9), ZOrder::TOP, mode=:default)
-		Gosu.draw_rect(162, 629, 176, 13, Gosu::Color.argb(0xff_ffffff), ZOrder::MIDDLE, mode=:default)
+		slider_border = Gosu::Image.new("elements/Slider_Border.png")
+		slider_inner = Gosu::Image.new("elements/Slider_Inner.png")
+		if @song.volume > 0
+			slider_inner = slider_inner.subimage(0, 0, (176 * @song.volume).to_i, 13)
+		end
+		slider_background = Gosu::Image.new("elements/Slider_Background.png")
 
+		slider_background.draw(162, 629, ZOrder::MIDDLE)
+		if @song.volume > 0
+			slider_inner.draw(162, 629, ZOrder::TOP)
+		end
+		slider_border.draw(162, 629, ZOrder::TOP)
 	end
 
 
@@ -273,6 +284,10 @@ class MusicPlayerMain < Gosu::Window
 				@song.volume = 0
 			end
 		end
+
+		if mouse_x.between?(162, 162 + 176) && mouse_y.between?(629, 629 + 13)
+			@is_dragging_volume = true
+		end
 	end
 
 	def draw
@@ -296,8 +311,14 @@ class MusicPlayerMain < Gosu::Window
 	def update
 		case @screen_type
 		when ScreenType::TRACKS
-			if mouse_x.between?(162, 162 + 176) && mouse_y.between?(629, 629 + 13) && @mouse_held
-				@song.volume = (mouse_x - 162) / 176.0
+			if @is_dragging_volume
+				if mouse_x < 162
+					@song.volume = 0
+				elsif mouse_x > 338
+					@song.volume = 1.0
+				else
+					@song.volume = (mouse_x - 162) / 176.0
+				end
 				@old_volume = @song.volume
 			end
 		end
@@ -306,7 +327,6 @@ class MusicPlayerMain < Gosu::Window
 	def button_down(id)
 		case id
 	    when Gosu::MsLeft
-			@mouse_held = true
 			case @screen_type
 			when ScreenType::ALBUMS
 				handle_mouse_albums_screen(mouse_x, mouse_y)
@@ -319,7 +339,7 @@ class MusicPlayerMain < Gosu::Window
 	def button_up(id)
 		case id
 	    when Gosu::MsLeft
-			@mouse_held = false
+			@is_dragging_volume = false
 	    end
 	end
 end
