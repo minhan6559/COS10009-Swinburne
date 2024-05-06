@@ -193,13 +193,11 @@ class MusicPlayerMain < Gosu::Window
 		# Draw the volume bar
 		slider_border = Gosu::Image.new("elements/Slider_Border.png")
 		slider_inner = Gosu::Image.new("elements/Slider_Inner.png")
-		if @song.volume > 0
-			slider_inner = slider_inner.subimage(0, 0, (176 * @song.volume).to_i, 13)
-		end
 		slider_background = Gosu::Image.new("elements/Slider_Background.png")
-
+		
 		slider_background.draw(162, 629, ZOrder::MIDDLE)
 		if @song.volume > 0
+			slider_inner = slider_inner.subimage(0, 0, (176 * @song.volume).to_i, 13)
 			slider_inner.draw(162, 629, ZOrder::TOP)
 		end
 		slider_border.draw(162, 629, ZOrder::TOP)
