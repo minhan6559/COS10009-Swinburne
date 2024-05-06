@@ -74,6 +74,17 @@ def read_albums(file_name)
     return albums
 end
 
+def read_artworks(albums)
+	artworks = []
+	i = 0
+
+	while i < albums.length
+		artworks << Gosu::Image.new("images/#{albums[i].artwork}.png")
+		i += 1
+	end
+	return artworks
+end
+
 class MusicPlayerMain < Gosu::Window
 
 	def initialize
@@ -83,6 +94,7 @@ class MusicPlayerMain < Gosu::Window
 		# Reads in an array of albums from a file and then prints all the albums in the
 		# array to the terminal
 		@albums = read_albums('albums.txt')
+		@artworks = read_artworks(@albums)
 
 		# Fonts
 		@big_font = Gosu::Font.new(25)
@@ -109,7 +121,6 @@ class MusicPlayerMain < Gosu::Window
 		@slider_inner = Gosu::Image.new("elements/Slider_Inner.png")
 		@slider_background = Gosu::Image.new("elements/Slider_Background.png")
 		@track_box = Gosu::Image.new("elements/Track_Box.png")
-
 	end
 	
 	def draw_albums_screen(albums)
@@ -121,9 +132,9 @@ class MusicPlayerMain < Gosu::Window
 		while i < 2
 			j = 0
 			while j < 2
-				album = albums[i * 2 + j]
-				artwork = Gosu::Image.new("images/#{album.artwork}.png")
-				artwork.draw(24 + j * 236, 91 + i * 302, ZOrder::TOP, scale_x = 0.4, scale_y = 0.4)
+				index = i * 2 + j
+				album = albums[index]
+				@artworks[index].draw(24 + j * 236, 91 + i * 302, ZOrder::TOP, scale_x = 0.4, scale_y = 0.4)
 
 				x_text = 132 + j * 236
 				x_minus = @small_font.text_width(album.title, 1.0) / 2.0
@@ -148,8 +159,7 @@ class MusicPlayerMain < Gosu::Window
 		@big_font.draw_markup("<b>#{album.title}</b>", x_title - x_minus, y_title, ZOrder::TOP, 1.0, 1.0, Gosu::Color::AQUA)
 
 		# Draw the album artwork
-		artwork = Gosu::Image.new("images/#{album.artwork}.png")
-		artwork.draw(114, 101, ZOrder::TOP, scale_x = 0.5, scale_y = 0.5)
+		@artworks[@selected_album].draw(114, 101, ZOrder::TOP, scale_x = 0.5, scale_y = 0.5)
 
 		# Draw the artist
 		x_artist = 246
