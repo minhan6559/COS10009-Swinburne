@@ -104,11 +104,13 @@ class MusicPlayerMain < Gosu::Window
 		@screen_type = ScreenType::ALBUMS
 		@selected_album = 0
 		@selected_track = 0
-		@old_volume = 1.0
+		@volume = 1.0
+		@song = nil
 
 		# Flags
 		@change_track = true
 		@manual_pause = false
+		@mute = false
 		@is_dragging_volume = false # For volume bar
 
 		# Buttons Images
@@ -180,15 +182,26 @@ class MusicPlayerMain < Gosu::Window
 			if i == @selected_track
 				track_title = "<b>#{track.title}</b>"
 				track_color = Gosu::Color.argb(0xff_4FCEFF)
-				if @change_track
-					@song = Gosu::Song.new(track.location)
-					@song.play(false)
-					@song.volume = @old_volume
-					@change_track = false
-				end
 			end
 			@small_font.draw_markup(track_title, 128, y_track, ZOrder::TOP, 1.0, 1.0, track_color)
 			i += 1
+		end
+
+		if @change_track
+			@song = Gosu::Song.new(album.tracks[@selected_track].location)
+			@change_track = false
+		end
+
+		if @manual_pause
+			@song.pause
+		else
+			@song.play(false)
+		end
+
+		if @mute
+			@song.volume = 0
+		else
+			@song.volume = @volume
 		end
 
 		if not @song.playing? and not @manual_pause
@@ -218,18 +231,17 @@ class MusicPlayerMain < Gosu::Window
 		@slider_border.draw(162, 629, ZOrder::TOP)
 	end
 
-
-	# Draw a coloured background using TOP_COLOR and BOTTOM_COLOR
-
 	def draw_background
 		Gosu.draw_rect(0, 0, 500, 700, BACKGROUND_COLOR, ZOrder::BACKGROUND, mode=:default)
 	end
 
-	# Handle the button_down event
-	def is_clicked?(x, y, btn)
-		x.between?(btn.x, btn.x + btn.width) && y.between?(btn.y, btn.y + btn.height)
+	def draw_credit
+		credit_text = "@Created by Minh An Nguyen, 2024"
+		x_credit = (500 - @credit_font.text_width(credit_text, 1.0)) / 2
+		@credit_font.draw_text(credit_text, x_credit, 666, ZOrder::TOP, 1.0, 1.0, Gosu::Color.argb(0xff_70D7FF))
 	end
-	
+
+	# Handle the button_down event
 	def handle_mouse_albums_screen(x, y)
 		i = 0
 		while i < 2
@@ -277,13 +289,7 @@ class MusicPlayerMain < Gosu::Window
 
 		# Play/Pause
 		if x.between?(230, 230 + 40) && y.between?(575, 575 + 40)
-			if @song.playing?
-				@song.pause
-				@manual_pause = true
-			else
-				@song.play
-				@manual_pause = false
-			end
+			@manual_pause = !@manual_pause
 		end
 
 		# Next
@@ -295,13 +301,10 @@ class MusicPlayerMain < Gosu::Window
 
 		# Speaker
 		if x.between?(120, 120 + 40) && y.between?(622, 622 + 40)
-			if @song.volume == 0
-				@song.volume = @old_volume
-			else
-				@song.volume = 0
-			end
+			@mute = !@mute
 		end
 
+		# Volume bar
 		if mouse_x.between?(162, 162 + 176) && mouse_y.between?(629, 629 + 13)
 			@is_dragging_volume = true
 		end
@@ -318,25 +321,19 @@ class MusicPlayerMain < Gosu::Window
 		end
 
 		# Draw credit
-		credit_text = "@Created by Minh An Nguyen, 2024"
-		x_credit = (500 - @credit_font.text_width(credit_text, 1.0)) / 2
-		@credit_font.draw_text(credit_text, x_credit, 666, ZOrder::TOP, 1.0, 1.0, Gosu::Color.argb(0xff_70D7FF))
+		draw_credit()
 	end
 
  	def needs_cursor?; true; end
 
 	def update
-		case @screen_type
-		when ScreenType::TRACKS
-			if @is_dragging_volume
-				if mouse_x < 162
-					@song.volume = 0
-				elsif mouse_x > 338
-					@song.volume = 1.0
-				else
-					@song.volume = (mouse_x - 162) / 176.0
-				end
-				@old_volume = @song.volume
+		if @screen_type == ScreenType::TRACKS and @is_dragging_volume
+			if mouse_x < 162
+				@volume = 0
+			elsif mouse_x > 338
+				@volume = 1.0
+			else
+				@volume = (mouse_x - 162) / 176.0
 			end
 		end
 	end
