@@ -83,6 +83,8 @@ class MusicPlayerMain < Gosu::Window
 		# Reads in an array of albums from a file and then prints all the albums in the
 		# array to the terminal
 		@albums = read_albums('albums.txt')
+
+		# Fonts
 		@big_font = Gosu::Font.new(25)
 		@small_font = Gosu::Font.new(18)
 		@credit_font = Gosu::Font.new(15)
@@ -90,12 +92,24 @@ class MusicPlayerMain < Gosu::Window
 		@screen_type = ScreenType::ALBUMS
 		@selected_album = 0
 		@selected_track = 0
+		@old_volume = 1.0
 
+		# Flags
 		@change_track = true
 		@manual_pause = false
 		@is_dragging_volume = false # For volume bar
 
-		@old_volume = 1.0
+		# Buttons Images
+		@home_btn = Gosu::Image.new("elements/Home_Button.png")
+		@media_btns_play = Gosu::Image.new("elements/Media_Buttons_Play.png")
+		@media_btns_pause = Gosu::Image.new("elements/Media_Buttons_Pause.png")
+		@speaker = Gosu::Image.new("elements/Speaker.png")
+		@speaker_mute = Gosu::Image.new("elements/Speaker_Mute.png")
+		@slider_border = Gosu::Image.new("elements/Slider_Border.png")
+		@slider_inner = Gosu::Image.new("elements/Slider_Inner.png")
+		@slider_background = Gosu::Image.new("elements/Slider_Background.png")
+		@track_box = Gosu::Image.new("elements/Track_Box.png")
+
 	end
 	
 	def draw_albums_screen(albums)
@@ -124,8 +138,7 @@ class MusicPlayerMain < Gosu::Window
 	end
 
 	def draw_tracks_screen(album)
-		home_btn = Gosu::Image.new("elements/Home_Button.png")
-		home_btn.draw(10, 9, ZOrder::TOP)
+		@home_btn.draw(10, 9, ZOrder::TOP)
 		@small_font.draw_text("Back to Home", 36, 12, ZOrder::TOP, 1.0, 1.0, Gosu::Color::WHITE)
 		
 		# Draw the album title
@@ -145,9 +158,7 @@ class MusicPlayerMain < Gosu::Window
 		@small_font.draw_text(album.artist, x_artist - x_minus, y_artist, ZOrder::TOP, 1.0, 1.0, Gosu::Color::WHITE)
 
 		# Draw the tracks
-		# Gosu.draw_rect(115, 420, 272, 133, Gosu::Color.argb(0xff_8E8E93), ZOrder::MIDDLE, mode=:default)
-		track_box = Gosu::Image.new("elements/Track_Box.png")
-		track_box.draw(115, 418, ZOrder::MIDDLE)
+		@track_box.draw(115, 418, ZOrder::MIDDLE)
 
 		i = 0
 		while i < album.tracks.length
@@ -177,30 +188,24 @@ class MusicPlayerMain < Gosu::Window
 
 		# Draw media elements
 		if @manual_pause
-			media_btns = Gosu::Image.new("elements/Media_Buttons_Play.png")
+			@media_btns_play.draw(161, 575, ZOrder::TOP)
 		else
-			media_btns = Gosu::Image.new("elements/Media_Buttons_Pause.png")
+			@media_btns_pause.draw(161, 575, ZOrder::TOP)
 		end
-		media_btns.draw(161, 575, ZOrder::TOP)
 
 		if @song.volume == 0
-			speaker = Gosu::Image.new("elements/Speaker_Mute.png")
+			@speaker_mute.draw(120, 622, ZOrder::TOP)
 		else
-			speaker = Gosu::Image.new("elements/Speaker.png")
+			@speaker.draw(120, 622, ZOrder::TOP)
 		end
-		speaker.draw(120, 622, ZOrder::TOP)
 
 		# Draw the volume bar
-		slider_border = Gosu::Image.new("elements/Slider_Border.png")
-		slider_inner = Gosu::Image.new("elements/Slider_Inner.png")
-		slider_background = Gosu::Image.new("elements/Slider_Background.png")
-		
-		slider_background.draw(162, 629, ZOrder::MIDDLE)
+		@slider_background.draw(162, 629, ZOrder::MIDDLE)
 		if @song.volume > 0
-			slider_inner = slider_inner.subimage(0, 0, (176 * @song.volume).to_i, 13)
+			slider_inner = @slider_inner.subimage(0, 0, (176 * @song.volume).to_i, 13)
 			slider_inner.draw(162, 629, ZOrder::TOP)
 		end
-		slider_border.draw(162, 629, ZOrder::TOP)
+		@slider_border.draw(162, 629, ZOrder::TOP)
 	end
 
 
@@ -211,6 +216,10 @@ class MusicPlayerMain < Gosu::Window
 	end
 
 	# Handle the button_down event
+	def is_clicked?(x, y, btn)
+		x.between?(btn.x, btn.x + btn.width) && y.between?(btn.y, btn.y + btn.height)
+	end
+	
 	def handle_mouse_albums_screen(x, y)
 		i = 0
 		while i < 2
