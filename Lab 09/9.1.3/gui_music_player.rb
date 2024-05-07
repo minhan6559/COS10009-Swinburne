@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'gosu'
 
 TOP_COLOR = Gosu::Color.new(0xFF1EB1FA)
