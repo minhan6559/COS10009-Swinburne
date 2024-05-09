@@ -161,7 +161,7 @@ class MusicPlayerMain < Gosu::Window
 				y_text = 317 + i * 302
 
 
-				if mouse_x.between?(x_album, x_album + ARTWORK_WIDTH * 0.4) && mouse_y.between?(y_album, y_text + @small_font.height)
+				if mouse_on_area?(x_album, y_album, x_album + ARTWORK_WIDTH * 0.4, y_text + @small_font.height)
 					album_title = "<b>#{album.title}</b>"
 					title_color = Gosu::Color.argb(0xff_64D2FF)
 					@album_background.draw(x_album - 4, y_album - 4, ZOrder::MIDDLE, scale_x = 0.4, scale_y = 0.4)
@@ -178,7 +178,7 @@ class MusicPlayerMain < Gosu::Window
 	end
 
 	def draw_tracks_screen(album)
-		if mouse_x.between?(10, 10 + 22 + @small_font.text_width("Back to Home", 1.0)) && mouse_y.between?(9, 9 + 22)
+		if mouse_on_area?(10, 9, 10 + 22 + @small_font.text_width("Back to Home", 1.0), 9 + 22)
 			@home_btn_hover.draw(10, 9, ZOrder::TOP)
 			@small_font.draw_text("Back to Home", 36, 12, ZOrder::TOP, 1.0, 1.0, Gosu::Color.argb(0xff_64D2FF))
 		else
@@ -222,7 +222,7 @@ class MusicPlayerMain < Gosu::Window
 		# Draw media elements
 
 		# Previous
-		if mouse_x.between?(161, 161 + 40) && mouse_y.between?(575, 575 + 40)
+		if mouse_on_area?(161, 575, 161 + 40, 575 + 40)
 			@backward_btn_hover.draw(161, 575, ZOrder::TOP)
 		else
 			@backward_btn.draw(161, 575, ZOrder::TOP)
@@ -230,13 +230,13 @@ class MusicPlayerMain < Gosu::Window
 
 		# Play/Pause
 		if @manual_pause
-			if mouse_x.between?(230, 230 + 40) && mouse_y.between?(575, 575 + 40)
+			if mouse_on_area?(230, 575, 230 + 40, 575 + 40)
 				@play_btn_hover.draw(230, 575, ZOrder::TOP)
 			else
 				@play_btn.draw(230, 575, ZOrder::TOP)
 			end
 		else
-			if mouse_x.between?(230, 230 + 40) && mouse_y.between?(575, 575 + 40)
+			if mouse_on_area?(230, 575, 230 + 40, 575 + 40)
 				@pause_btn_hover.draw(230, 575, ZOrder::TOP)
 			else
 				@pause_btn.draw(230, 575, ZOrder::TOP)
@@ -244,20 +244,20 @@ class MusicPlayerMain < Gosu::Window
 		end
 
 		# Next
-		if mouse_x.between?(300, 300 + 40) && mouse_y.between?(575, 575 + 40)
+		if mouse_on_area?(300, 575, 300 + 40, 575 + 40)
 			@forward_btn_hover.draw(300, 575, ZOrder::TOP)
 		else
 			@forward_btn.draw(300, 575, ZOrder::TOP)
 		end
 
 		if @song.volume == 0
-			if mouse_x.between?(120, 120 + 28) && mouse_y.between?(622, 622 + 28)
+			if mouse_on_area?(120, 622, 120 + 28, 622 + 28)
 				@speaker_mute_hover.draw(120, 622, ZOrder::TOP)
 			else
 				@speaker_mute.draw(120, 622, ZOrder::TOP)
 			end
 		else
-			if mouse_x.between?(120, 120 + 28) && mouse_y.between?(622, 622 + 28)
+			if mouse_on_area?(120, 622, 120 + 28, 622 + 28)
 				@speaker_hover.draw(120, 622, ZOrder::TOP)
 			else
 				@speaker.draw(120, 622, ZOrder::TOP)
@@ -292,7 +292,7 @@ class MusicPlayerMain < Gosu::Window
 				x_album = 24 + j * 236
 				y_album = 91 + i * 302
 				y_text = 317 + i * 302
-				if mouse_x.between?(x_album, x_album + ARTWORK_WIDTH * 0.4) && mouse_y.between?(y_album, y_text + @small_font.height)
+				if mouse_on_area?(x_album, y_album, x_album + ARTWORK_WIDTH * 0.4, y_text + @small_font.height)
 					@selected_album = i * 2 + j
 					@screen_type = ScreenType::TRACKS
 				end
@@ -304,7 +304,7 @@ class MusicPlayerMain < Gosu::Window
 
 	def handle_mouse_tracks_screen(x, y)
 		# Back to home
-		if x.between?(10, 10 + 22 + @small_font.text_width("Back to Home", 1.0)) && y.between?(9, 9 + 22)
+		if mouse_on_area?(10, 9, 10 + 22 + @small_font.text_width("Back to Home", 1.0), 9 + 22)
 			@screen_type = ScreenType::ALBUMS
 			@selected_track = 0
 			@song.stop
@@ -315,7 +315,7 @@ class MusicPlayerMain < Gosu::Window
 		# Select track
 		i = 0
 		while i < @albums[@selected_album].tracks.length
-			if x.between?(115, 115 + 272) && y.between?(430 + i * 30, 430 + i * 30 + 30)
+			if mouse_on_area?(115, 430 + i * 30, 115 + 272, 430 + i * 30 + 30)
 				if @selected_track != i
 					@selected_track = i
 					@change_track = true
@@ -326,13 +326,13 @@ class MusicPlayerMain < Gosu::Window
 
 		# Media elements
 		# Previous
-		if x.between?(161, 161 + 40) && y.between?(575, 575 + 40)
+		if mouse_on_area?(161, 575, 161 + 40, 575 + 40)
 			@selected_track = (@selected_track - 1) % @albums[@selected_album].tracks.length
 			@change_track = true
 		end
 
 		# Play/Pause
-		if x.between?(230, 230 + 40) && y.between?(575, 575 + 40)
+		if mouse_on_area?(230, 575, 230 + 40, 575 + 40)
 			if @song.playing?
 				@song.pause
 			else
@@ -342,13 +342,13 @@ class MusicPlayerMain < Gosu::Window
 		end
 
 		# Next
-		if x.between?(300, 300 + 40) && y.between?(575, 575 + 40)
+		if mouse_on_area?(300, 575, 300 + 40, 575 + 40)
 			@selected_track = (@selected_track + 1) % @albums[@selected_album].tracks.length
 			@change_track = true
 		end
 
 		# Speaker
-		if x.between?(120, 120 + 40) && y.between?(622, 622 + 40)
+		if mouse_on_area?(120, 622, 120 + 40, 622 + 40)
 			if not @mute and @song.volume == 0
 				@mute = true
 				@volume = 1.0
@@ -357,7 +357,7 @@ class MusicPlayerMain < Gosu::Window
 		end
 
 		# Volume bar
-		if mouse_x.between?(162, 162 + 176) && mouse_y.between?(629, 629 + 13)
+		if mouse_on_area?(162, 629, 162 + 176, 629 + 13)
 			@is_dragging_volume = true
 		end
 	end
@@ -376,10 +376,13 @@ class MusicPlayerMain < Gosu::Window
 		draw_credit()
 	end
 
+	def mouse_on_area?(leftX, topY, rightX, bottomY)
+		return mouse_x.between?(leftX, rightX) && mouse_y.between?(topY, bottomY)
+	end
+
  	def needs_cursor?; true; end
 
 	def update
-
 		case @screen_type
 		when ScreenType::TRACKS
 			# Handle the song
