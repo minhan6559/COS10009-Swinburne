@@ -14,7 +14,7 @@ end
 
 # Put your record definitions here
 class Album
-	attr_accessor :title, :artist, :genre, :artwork, :tracks
+	attr_accessor :title, :artist, :artwork, :tracks
 
 	def initialize (title, artist, artwork, tracks)
 		@title = title
