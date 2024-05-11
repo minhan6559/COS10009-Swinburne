@@ -123,10 +123,11 @@ def display_albums(albums)
 end
 
 def display_albums_by_genre(albums)
-    puts "1. Pop"
-    puts "2. Classic"
-    puts "3. Jazz"
-    puts "4. Rock"
+    i = 1
+    while i < $genre_names.length
+        puts "#{i}. #{$genre_names[i]}"
+        i += 1
+    end
 
     genre = read_integer_in_range("Enter the genre: ", 1, 4)
 

@@ -126,6 +126,15 @@ class GameWindow < Gosu::Window
   # But you DO need to complete it later for the Maze Search task
   def search(cell_x ,cell_y)
 
+    if cell_x < 0 or cell_x >= (MAP_WIDTH / CELL_DIM) or cell_y < 0 or cell_y >= (MAP_HEIGHT / CELL_DIM)
+      return nil
+    end
+
+    cell = @columns[cell_x][cell_y]
+    if not cell.vacant or cell.visited
+      return nil
+    end
+
     dead_end = false
     path_found = false
 
@@ -136,11 +145,6 @@ class GameWindow < Gosu::Window
       [[cell_x,cell_y]]  # We are at the east wall - exit
     else
 
-      north_path = nil
-      west_path = nil
-      east_path = nil
-      south_path = nil
-
       if (ARGV.length > 0) # debug
         puts "Searching. In cell x: " + cell_x.to_s + " y: " + cell_y.to_s
       end
@@ -150,42 +154,25 @@ class GameWindow < Gosu::Window
       # cells such as vacant, visited and on_path.
       # Cells on the outer boundaries will always have a nil on the
       # boundary side
-      cell = @columns[cell_x][cell_y]
 
-      if cell.north and cell.north.vacant and not cell.north.visited
-        cell.north.visited = true
-        north_path = search(cell_x, cell_y - 1)
-        cell.north.visited = false
-      end
+      cell.visited = true
+      directions = [[0,-1],[0,1],[1,0],[-1,0]]
+      path = nil
       
-      if cell.south and cell.south.vacant and not cell.south.visited
-        cell.south.visited = true
-        south_path = search(cell_x, cell_y + 1)
-        cell.south.visited = false
+      i = 0
+      while i < directions.length
+        next_x = cell_x + directions[i][0]
+        next_y = cell_y + directions[i][1]
+        next_path = search(next_x, next_y)
+        if next_path != nil
+          path = next_path
+          break
+        end
+        i += 1
       end
 
-      if cell.east and cell.east.vacant and not cell.east.visited
-        cell.east.visited = true
-        east_path = search(cell_x + 1, cell_y)
-        cell.east.visited = false
-      end
-
-      if cell.west and cell.west.vacant and not cell.west.visited
-        cell.west.visited = true
-        west_path = search(cell_x - 1, cell_y)
-        cell.west.visited = false
-      end
-
+      cell.visited = false
       # pick one of the possible paths that is not nil (if any):
-      if (north_path != nil)
-        path = north_path
-      elsif (south_path != nil)
-        path = south_path
-      elsif (east_path != nil)
-        path = east_path
-      elsif (west_path != nil)
-        path = west_path
-      end
 
       # A path was found:
       if (path != nil)
