@@ -1,1 +1,0 @@
-https://github.com/minhan6559/ANNalyze/blob/e5d52cf21e6dfded26abd8e88d73d3e05509279e/Artificial_Neural_Network.pdf
